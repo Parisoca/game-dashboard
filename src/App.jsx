@@ -163,7 +163,7 @@ export default function App() {
             <img 
                 src="/logodark.png" 
                 alt="ParisiHub Logo" 
-                style={{ maxWidth: '100%', height: 'auto', maxHeight: '50px' }} 
+                style={{ maxWidth: '100%', height: 'auto', maxHeight: '130px' }} 
             />
         </div>
 
