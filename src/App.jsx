@@ -77,11 +77,12 @@ export default function App() {
 
   const checkStatus = async () => {
     try {
-      // In a real setup, you might pass ?server=${activeGameId} to the API
-      const res = await fetch(`${API_URL}/server/status`);
+      // FIX 1: Pass the server query param to the API
+      const res = await fetch(`${API_URL}/server/status?server=${activeGameId}`);
       const data = await res.json();
       
-      if (activeGameId === 'satisfactory' && data.status) {
+      // FIX 2: Allow any game to return status (removed the 'satisfactory' hardcode)
+      if (data.status) {
         setStatus(data.status);
       } else {
         setStatus('OFFLINE');
@@ -101,6 +102,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ server: activeGameId })
       });
+      // Wait 2s for backend to process, then re-check status
       setTimeout(checkStatus, 2000);
     } catch (err) {
       alert(`Failed to ${action} server`);
@@ -111,6 +113,7 @@ export default function App() {
   // Helper handler for changing games
   const handleGameChange = (gameId) => {
       setActiveGameId(gameId);
+      // Reset status to UNKNOWN briefly while we fetch the new server's status
       setStatus('UNKNOWN');
   };
 
