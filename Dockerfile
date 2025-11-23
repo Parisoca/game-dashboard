@@ -1,8 +1,8 @@
 # Stage 1: Build the React App
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json .
-# Install dependencies (including dev dependencies for building)
+# Install dependencies
 RUN npm install
 COPY . .
 # Build the static files
