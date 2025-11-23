@@ -30,15 +30,15 @@ export default function App() {
 
   const checkStatus = async () => {
     try {
-      // Note: In the future, you might want to pass ?server=gameId to this endpoint
       const res = await fetch(`${API_URL}/server/status`);
       const data = await res.json();
       
-      // Simple logic: If we are looking at Satisfactory, use real data.
-      // For others, we default to OFFLINE until you add backend support.
-      if (activeGameId === 'satisfactory' && data.servers && data.servers.length > 0) {
-        setStatus(data.servers[0].status);
+      // --- FIX APPLIED HERE ---
+      // We check if we are on the 'satisfactory' tab, and if 'data.status' exists directly
+      if (activeGameId === 'satisfactory' && data.status) {
+        setStatus(data.status);
       } else {
+        // Fallback for other games (until backend support is added) or if API fails
         setStatus('OFFLINE');
       }
       setLastChecked(Date.now());
@@ -55,6 +55,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ server: activeGameId })
       });
+      // Wait 2 seconds then check status immediately
       setTimeout(checkStatus, 2000);
     } catch (err) {
       alert(`Failed to ${action} server`);
@@ -97,6 +98,7 @@ export default function App() {
   const StatusCard = () => {
     const isOnline = status === 'ONLINE' || status === 'STARTED';
     const isBusy = loading;
+    // Determine background color based on status
     const bgColor = isOnline ? activeGame.color : (status === 'UNKNOWN' ? '#d97706' : '#3f3f46');
     
     return (
@@ -194,9 +196,9 @@ export default function App() {
                 fontSize: '0.8rem', 
                 padding: '4px 12px', 
                 borderRadius: '20px', 
-                background: status === 'ONLINE' ? 'rgba(74, 222, 128, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
-                color: status === 'ONLINE' ? '#4ade80' : '#ef4444',
-                border: `1px solid ${status === 'ONLINE' ? '#4ade80' : '#ef4444'}`
+                background: (status === 'ONLINE' || status === 'STARTED') ? 'rgba(74, 222, 128, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
+                color: (status === 'ONLINE' || status === 'STARTED') ? '#4ade80' : '#ef4444',
+                border: `1px solid ${(status === 'ONLINE' || status === 'STARTED') ? '#4ade80' : '#ef4444'}`
               }}>
                 {status}
               </span>
@@ -220,7 +222,7 @@ export default function App() {
           </div>
 
           {/* Smaller Stats */}
-          <CircleStat label="Active Players" value={status === 'ONLINE' ? "0" : "-"} color={activeGame.color} />
+          <CircleStat label="Active Players" value={(status === 'ONLINE' || status === 'STARTED') ? "0" : "-"} color={activeGame.color} />
           <CircleStat label="Memory Usage" value="-" color="#8b5cf6" />
         </div>
 
@@ -281,20 +283,20 @@ export default function App() {
              <div style={{ marginBottom: '15px' }}>
                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem' }}>
                  <span>CPU</span>
-                 <span>{status === 'ONLINE' ? '12%' : '0%'}</span>
+                 <span>{(status === 'ONLINE' || status === 'STARTED') ? '12%' : '0%'}</span>
                </div>
                <div style={{ height: '8px', background: '#3f3f46', borderRadius: '4px', overflow: 'hidden' }}>
-                 <div style={{ width: status === 'ONLINE' ? '12%' : '0%', height: '100%', background: '#3b82f6' }}></div>
+                 <div style={{ width: (status === 'ONLINE' || status === 'STARTED') ? '12%' : '0%', height: '100%', background: '#3b82f6' }}></div>
                </div>
              </div>
 
              <div>
                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem' }}>
                  <span>RAM</span>
-                 <span>{status === 'ONLINE' ? '1.6 GB' : '0 GB'}</span>
+                 <span>{(status === 'ONLINE' || status === 'STARTED') ? '1.6 GB' : '0 GB'}</span>
                </div>
                <div style={{ height: '8px', background: '#3f3f46', borderRadius: '4px', overflow: 'hidden' }}>
-                 <div style={{ width: status === 'ONLINE' ? '25%' : '0%', height: '100%', background: '#8b5cf6' }}></div>
+                 <div style={{ width: (status === 'ONLINE' || status === 'STARTED') ? '25%' : '0%', height: '100%', background: '#8b5cf6' }}></div>
                </div>
              </div>
           </div>
